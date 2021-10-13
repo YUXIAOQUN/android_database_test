@@ -14,10 +14,12 @@ import com.example.datbase_test.entity.TUGDao;
 import com.example.datbase_test.entity.User;
 import com.example.datbase_test.entity.UserDao;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
 public class TUGActivity extends AppCompatActivity implements View.OnClickListener {
-    Button save;
+    Button save, show;
     EditText et_tug_time;
     float tug_time;
     String user_name;
@@ -27,8 +29,10 @@ public class TUGActivity extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tugactivity);
         et_tug_time = findViewById(R.id.et_tug_time);
-        save = findViewById(R.id.tug_time);
+        save = findViewById(R.id.save);
+        show = findViewById(R.id.show);
         save.setOnClickListener(this);
+        show.setOnClickListener(this);
 
         // get the user name from the last activity
         Intent intent = getIntent();
@@ -38,12 +42,26 @@ public class TUGActivity extends AppCompatActivity implements View.OnClickListen
     // save features
     @Override
     public void onClick(View view) {
-        tug_time = Float.parseFloat(et_tug_time.getText().toString());
-        User user = queryUserbyName(user_name);
-        TUG tug = new TUG(null, tug_time, user.getId());
         TUGDao tugDao = MyApplication.daoSession.getTUGDao();
-        tugDao.insert(tug);
-        Toast.makeText(this, "insert tug successfully", Toast.LENGTH_SHORT).show();
+        User user = queryUserbyName(user_name);
+        switch (view.getId()){
+            case R.id.save:
+                tug_time = Float.parseFloat(et_tug_time.getText().toString());
+
+                TUG tug = new TUG(null, tug_time, user.getId());
+                tugDao.insert(tug);
+                Toast.makeText(this, "insert tug successfully", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.show:
+                // get the most recent performance
+                List<TUG> list = tugDao.queryBuilder().where(TUGDao.Properties.UserId.eq(user.getId())).
+                        limit(1).orderDesc(TUGDao.Properties.Id).list();
+                Toast.makeText(this, "most recent record is " + list.get(0).getTime(),
+                        Toast.LENGTH_SHORT).show();
+
+                break;
+
+        }
 
 
     }
