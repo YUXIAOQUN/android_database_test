@@ -1,3 +1,5 @@
+import javax.xml.validation.Schema
+
 plugins {
     id 'com.android.application'
     id 'org.greenrobot.greendao' // apply plugin
@@ -14,6 +16,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    greendao{
+        schemaVersion 2
     }
 
     buildTypes {
